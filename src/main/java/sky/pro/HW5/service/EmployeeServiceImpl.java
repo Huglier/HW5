@@ -1,7 +1,9 @@
 package sky.pro.HW5.service;
 
+import org.apache.commons.lang3.StringUtils;
 import sky.pro.HW5.exception.EmployeeAlreadyAddedException;
 import sky.pro.HW5.exception.EmployeeNotFoundException;
+import sky.pro.HW5.exception.InvalidNameException;
 import sky.pro.HW5.model.Employee;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,8 +16,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public EmployeeServiceImpl() {
     }
-
+    @Override
     public void addEmployee(Employee employee) {
+        validation(employee.getFirstName(), employee.getLastName());
+        employee.setFirstName(StringUtils.capitalize(employee.getFirstName().toLowerCase()));
+        employee.setLastName(StringUtils.capitalize(employee.getLastName().toLowerCase()));
         Map var10000 = this.employees;
         String var10001 = employee.getFirstName();
         if (var10000.containsKey(var10001 + employee.getLastName() + employee.getSalary() + employee.getDepartmentId())) {
@@ -24,7 +29,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             this.employees.put(employee.getFirstName() + employee.getLastName(), employee);
         }
     }
-
+    @Override
     public void removeEmployee(String firstName, String lastName, Integer salary, Integer departmentId) {
         if (!this.employees.containsKey(firstName + lastName + salary + departmentId)) {
             throw new EmployeeNotFoundException("Employee has not been found");
@@ -32,7 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             this.employees.remove(firstName + lastName + salary + departmentId);
         }
     }
-
+    @Override
     public Employee findEmployee(String firstName, String lastName, Integer salary, Integer departmentId) {
         if (!this.employees.containsKey(firstName + lastName + salary + departmentId)) {
             throw new EmployeeNotFoundException("Employee has not been found");
@@ -43,5 +48,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public Collection<Employee> getAll() {
         return this.employees.values();
+    }
+
+    public void validation(String... names){
+        for (String name: names){
+            if (!StringUtils.isAlpha(name)){
+                throw new InvalidNameException("Name need have only letters");
+            }
+        }
     }
 }
